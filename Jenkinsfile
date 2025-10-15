@@ -78,7 +78,16 @@ pipeline {
                 script {
                     docker.image('python:3.13-slim').inside {
                         sh '''
+                            # สร้าง Virtual Environment ชื่อ venv
+                            python -m venv venv
+                            
+                            # Activate Virtual Environment
+                            source venv/bin/activate
+                            
+                            # ติดตั้ง Dependencies ภายใน venv
                             pip install --no-cache-dir -r requirements.txt
+                            
+                            # รัน Test
                             pytest -v --tb=short --junitxml=test-results.xml
                         '''
                     }
@@ -90,7 +99,6 @@ pipeline {
                 }
             }
         }
-
         // Stage 3: Build & Push Docker Image (Push latest เฉพาะ main)
         stage('Build & Push Docker Image') {
             when { expression { params.ACTION == 'Build & Deploy' } }
